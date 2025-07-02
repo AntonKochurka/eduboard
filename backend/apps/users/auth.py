@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
-@router.post("/")
-async def new_user():
+@router.post("/obtain")
+async def obtain_pair():
     return JSONResponse({})
