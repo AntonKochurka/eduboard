@@ -1,4 +1,5 @@
 import jwt
+import uuid
 
 from datetime import datetime, timedelta, timezone
 from .schemas import Payload
@@ -16,6 +17,7 @@ def generate_token(payload: Payload) -> tuple[str, float]:
         raise ValueError("Invalid token type")
 
     payload.exp = int(expire.timestamp())
+    payload.jti = str(uuid.uuid4())
 
     token = jwt.encode(
         payload.model_dump(),
@@ -25,7 +27,7 @@ def generate_token(payload: Payload) -> tuple[str, float]:
 
     return token, payload.exp
 
-def decode_token(token):
+def decode_token(token: str) -> dict:
     return jwt.decode(
         token, 
         key=settings.SECRET_KEY,

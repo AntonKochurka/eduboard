@@ -7,6 +7,7 @@ class ObtainTokensRequest(BaseModel):
 
 class Payload(BaseModel):
     sub: str
+    jti: str | None = None
     exp: float | None = None
 
     token_type: Literal["access", "refresh"]

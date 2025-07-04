@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-from . import schemas, services
+from . import schemas, services, dependencies
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -28,3 +28,9 @@ async def obtain_pair(
     )
 
     return response
+
+@router.get("/protected")
+async def protected(
+    user = Depends(dependencies.get_current_user)
+):
+    return JSONResponse(user)
