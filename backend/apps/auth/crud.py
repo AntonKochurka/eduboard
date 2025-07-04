@@ -11,10 +11,6 @@ async def is_jti_blacklisted(jti: str, session: AsyncSession) -> bool:
 
     return result.scalar_one_or_none() is not None
 
-async def is_token_blacklisted(token: str, session: AsyncSession) -> bool:
-    jti = decode_token(token)["jti"]
-    return await is_jti_blacklisted(jti=jti, session=session)
-
 async def blacklist_jti(*, jti: str, token_type: str, session: AsyncSession) -> BlacklistedToken:
     if await is_jti_blacklisted(jti, session):
         return await session.scalar(
@@ -30,7 +26,3 @@ async def blacklist_jti(*, jti: str, token_type: str, session: AsyncSession) -> 
     await session.refresh(token)
 
     return token
-
-async def blacklist_token(*, token: str, token_type: str, session: AsyncSession) -> BlacklistedToken:
-    jti = decode_token(token)["jti"]
-    return await blacklist_jti(jti=jti, token_type=token_type, session=session)

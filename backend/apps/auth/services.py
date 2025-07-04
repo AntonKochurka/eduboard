@@ -2,11 +2,13 @@ import jwt
 import uuid
 
 from datetime import datetime, timedelta, timezone
-from .schemas import Payload
+from . import crud, schemas
+
+from core.database import AsyncSession
 from core.settings import settings
 
 
-def generate_token(payload: Payload) -> tuple[str, float]:
+def generate_token(payload: schemas.Payload) -> tuple[str, float]:
     now = datetime.now(tz=timezone.utc)
 
     if payload.token_type == "access":
@@ -33,3 +35,11 @@ def decode_token(token: str) -> dict:
         key=settings.SECRET_KEY,
         algorithms=[settings.ALGORITHM]
     )
+
+async def is_token_blacklisted(token: str, session: AsyncSession) -> bool:
+    jti = decode_token(token)["jti"]
+    return await crud.is_jti_blacklisted(jti=jti, session=session)
+
+async def blacklist_token(*, token: str, token_type: str, session: AsyncSession):
+    jti = decode_token(token)["jti"]
+    return await crud.blacklist_jti(jti=jti, token_type=token_type, session=session)
